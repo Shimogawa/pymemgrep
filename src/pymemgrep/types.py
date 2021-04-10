@@ -1,5 +1,7 @@
 import ctypes as _ctypes
 from typing import Any
+import struct as _struct
+import os as _os
 
 HANDLE = _ctypes.c_void_p
 ULONGLONG = _ctypes.c_ulonglong
@@ -11,6 +13,9 @@ PVOID = _ctypes.c_void_p
 SIZE_T = _ctypes.c_size_t
 
 NULL = _ctypes.c_void_p(0)
+
+IS_X64 = _struct.calcsize("P") == 8
+IS_WIN = _os.name == "nt"
 
 
 def is_null(ptr: Any) -> bool:

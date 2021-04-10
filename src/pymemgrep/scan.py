@@ -2,7 +2,9 @@ import ctypes as _ctypes
 from typing import Any, List, Union, Optional
 
 from .types import *
-from . import _nt as _nt
+
+if IS_WIN:
+    from . import _nt as _nt
 from . import mem as _mem
 
 
@@ -45,8 +47,9 @@ class MemScanner:
         if process == 0:
             raise RuntimeError("Invalid handle.")
         self._pid: int = process if isinstance(process, int) else _mem.get_pid(process)
-        self._handle = _nt.open_process(self._pid)
-        self._sysinfo = _nt.SYSINFO
+        if IS_WIN:
+            self._handle = _nt.open_process(self._pid)
+            self._sysinfo = _nt.SYSINFO
         self._init_region_list()
 
     def _init_region_list(self) -> None:

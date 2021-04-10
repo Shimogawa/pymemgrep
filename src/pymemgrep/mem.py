@@ -1,18 +1,28 @@
-from typing import Union
+from typing import Union, Optional
 import ctypes as _ctypes
 from struct import unpack as _unpack
 from struct import calcsize as _calcsize
 from inspect import getmodule as _getmodule
+import psutil as _psutil
 
-from . import _nt as _nt
 from . import types as _types
 
+if _types.IS_WIN:
+    from . import _nt as _nt
 
-def get_pid(proc_name: str) -> int:
-    pid = _nt.get_pid(proc_name)
-    if pid is None:
+
+def get_process(name: str) -> Optional[_psutil.Process]:
+    for proc in _psutil.process_iter():
+        if name in proc.name():
+            return proc
+    return None
+
+
+def get_pid(name: str) -> int:
+    p = get_process(name)
+    if p is None:
         raise ValueError("Process can not be found.")
-    return pid
+    return p.pid
 
 
 def get_handle(proc: Union[int, str]) -> _types.HANDLE:
@@ -46,8 +56,6 @@ _NATIVE_TYPES = {
     "double": ("d", float),
 }
 
-_cur_module = _getmodule(read_mem)
-
 
 def _make_read_mem_func(t, tcode, ret_type):
     def f(proc_handle: _types.HANDLE, base_addr: int):
@@ -56,6 +64,8 @@ def _make_read_mem_func(t, tcode, ret_type):
     f.__annotations__["return"] = ret_type
     f.__name__ = f"read_mem_{t}"
     return f
+
+_cur_module = _getmodule(read_mem)
 
 
 for t, (tcode, ret_type) in _NATIVE_TYPES.items():

@@ -7,8 +7,6 @@ from enum import IntFlag
 from .types import *
 
 
-IS_X64 = struct.calcsize("P") == 8
-
 _kernel32 = ctypes.windll.kernel32
 
 PROCESS_QUERY_INFORMATION = 0x0400
@@ -76,20 +74,6 @@ class MEMORY_BASIC_INFORMATION_X64(ctypes.Structure):
         ("Type", DWORD),
         ("__alignment2", DWORD),
     ]
-
-
-def get_process(name: str) -> Optional[psutil.Process]:
-    for proc in psutil.process_iter():
-        if proc.name() == name:
-            return proc
-    return None
-
-
-def get_pid(name: str) -> Optional[int]:
-    p = get_process(name)
-    if p is None:
-        return None
-    return p.pid
 
 
 def open_process(pid: int) -> HANDLE:
