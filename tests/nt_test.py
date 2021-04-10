@@ -2,6 +2,7 @@ import sys
 sys.path.append("src")
 
 import pymemgrep._nt as nt
+import pymemgrep.mem as mem
 import ctypes
 
 # osu = nt.open_process("osu!.exe")
@@ -12,7 +13,7 @@ sysinfo = nt.SYSINFO
 # print(hex(sysinfo.MinimumApplicationAddress))
 # print(hex(sysinfo.MaximumApplicationAddress))
 
-handle = nt.open_process(nt.get_pid("Code.exe"))
+handle = nt.open_process(mem.get_pid("Code.exe"))
 addr = sysinfo.MinimumApplicationAddress
 while True:
     meminfo = nt.query_mem_info(handle, addr)
